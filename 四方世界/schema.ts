@@ -321,6 +321,8 @@ export const Schema = z.object({
     种族: z.string().prefault(''),
     is_companion: z.boolean().prefault(false),
     在场: z.boolean().prefault(false),
+    好感度: z.union([z.coerce.number(), z.record(z.string(), z.coerce.number())]).prefault(0),
+    信任度: z.union([z.coerce.number(), z.record(z.string(), z.coerce.number())]).prefault(0),
     能力: z.object({
         力量: z.coerce.number().prefault(5),
         敏捷: z.coerce.number().prefault(5),

@@ -12,7 +12,7 @@
 
   let prevMoneySnapshot: any = null;
   eventOnFn(EVENT_STARTED, function (variables: any) {
-    const money = variables?.stat_data?.主角?.金钱;
+    const money = variables?.stat_data?.主角?.背包?.金钱;
     if (money) {
       try {
         prevMoneySnapshot = JSON.parse(JSON.stringify(money));
@@ -36,7 +36,7 @@
   function findItem(owner: any, name: string) {
     if (!owner || !name) return null;
     const bag = owner.背包;
-    const catKeys = ['武器', '防具', '饰品', '消耗品', '材料'];
+    const catKeys = ['武器', '防具', '饰品', '消耗品', '材料', '杂物'];
     if (bag && typeof bag === 'object') {
       for (const c of catKeys) {
         const bucket = bag[c];
@@ -83,7 +83,7 @@
       p.经验等级 = parseInt(p.经验等级, 10) + 1;
       p.职业点数 = parseInt(p.职业点数, 10) + 1;
       p.职业经验.升级所需 = JOB_LEVEL_XP_TABLE[p.经验等级] || Math.round(req * EXP_MULT);
-      msgOut.push(`经验等级提升至 ${p.经验等级} 级！获得 1 职业点数！`);
+      msgOut.push(`经验等级提升至 ${p.经验等级} 级！获得 1 技能点！`);
     }
   }
 
@@ -102,13 +102,20 @@
 
       if (p.能力[a] != null) {
         p.能力[a] = num(p.能力[a]) + k;
+        // 同步增加资源当前值，保持与最大值的增幅一致
         if (a === '力量') {
           p.生命值 = p.生命值 || { 当前值: 0, 最大值: 0 };
           p.生命值.当前值 = num(p.生命值.当前值) + 5 * k;
+          p.体力值 = p.体力值 || { 当前值: 0, 最大值: 0 };
+          p.体力值.当前值 = num(p.体力值.当前值) + 1 * k;
         }
         if (a === '感知') {
           p.生命值 = p.生命值 || { 当前值: 0, 最大值: 0 };
           p.生命值.当前值 = num(p.生命值.当前值) + 2 * k;
+        }
+        if (a === '敏捷') {
+          p.体力值 = p.体力值 || { 当前值: 0, 最大值: 0 };
+          p.体力值.当前值 = num(p.体力值.当前值) + 1 * k;
         }
         if (a === '魔力') {
           p.魔力值 = p.魔力值 || { 当前值: 0, 最大值: 0 };
@@ -123,7 +130,7 @@
     }
   }
 
-  const SKILL_LEVELS = ['初级', '中级', '高级', '大师'];
+  const SKILL_LEVELS = ['初级', '中级', '高级', '精通', '大师'];
   const SKILL_MULT = 1.5;
   function skillLevelUp(stat: any, msgOut: string[]) {
     const p = stat?.主角;
@@ -159,55 +166,44 @@
   }
 
   function cleanupEquip(ch: any) {
-    if (!ch || !ch.装备栏) return;
-    const slots = [
-      ['装备栏', '武器'], ['装备栏', '副手'], ['装备栏', '饰品'],
-      ['装备栏', '防具', '头部'], ['装备栏', '防具', '身体'],
-      ['装备栏', '防具', '手部'], ['装备栏', '防具', '腿部'], ['装备栏', '防具', '内衬'],
-    ];
-
-    for (const path of slots) {
-      let node = ch;
-      let parent: any = null;
-      let lastKey: any = null;
-      for (const key of path) {
-        if (!node || typeof node !== 'object') {
-          node = null;
-          break;
-        }
-        parent = node;
-        lastKey = key;
-        node = node[key];
+    if (!ch || !ch.装备) return;
+    const equip = ch.装备;
+    ['武器', '防具', '饰品'].forEach(cat => {
+      if (equip[cat] && typeof equip[cat] === 'object') {
+        Object.entries(equip[cat]).forEach(([slotKey, slotVal]) => {
+          if (typeof slotVal === 'string') {
+            if (!findItem(ch, slotVal)) delete equip[cat][slotKey];
+          }
+        });
       }
-      if (!parent || !lastKey) continue;
-
-      const slotVal = node;
-      if (typeof slotVal === 'string') {
-        if (!findItem(ch, slotVal)) {
-          parent[lastKey] = null;
-        }
-      }
-    }
+    });
   }
 
   function twoHandRule(ch: any) {
-    if (!ch || !ch.装备栏) return;
-    const weaponSlot = ch.装备栏.武器;
-    const weaponName = typeof weaponSlot === 'string' ? weaponSlot : null;
-    const weapon = weaponName
-      ? findItem(ch, weaponName)
-      : typeof weaponSlot === 'object' && weaponSlot !== null
-        ? weaponSlot
-        : null;
-    if (weapon && String(weapon.hands || '').trim() === '双手') {
-      ch.装备栏.副手 = null;
+    if (!ch || !ch.装备) return;
+    const weapons = ch.装备.武器 || {};
+    let hasTwoHanded = false;
+    Object.values(weapons).forEach((weapon: any) => {
+      const item = typeof weapon === 'string' ? findItem(ch, weapon) : weapon;
+      if (item && String(item.hands || '').trim() === '双手') {
+        hasTwoHanded = true;
+      }
+    });
+    // 简单的双持互斥：如果有双手武器，清空除该武器外的其他武器
+    if (hasTwoHanded) {
+      const newWeapons: any = {};
+      Object.entries(weapons).forEach(([k, v]: [string, any]) => {
+        const item = typeof v === 'string' ? findItem(ch, v) : v;
+        if (item && String(item.hands || '').trim() === '双手') newWeapons[k] = v;
+      });
+      ch.装备.武器 = newWeapons;
     }
   }
 
   function totalAbilities(ch: any) {
     if (!ch || !ch.能力) return;
     const A = ['力量', '敏捷', '感知', '知识', '魅力', '魔力', '信仰力'];
-    const equip = ch.装备栏 || {};
+    const equip = ch.装备 || {};
     const states = ch.当前状态 || {};
 
     function itemBonus(slot: any, a: string) {
@@ -221,12 +217,14 @@
 
     for (const a of A) {
       let t = num(ch.能力[a] ?? 0);
-      t += itemBonus(equip.武器, a);
-      t += itemBonus(equip.副手, a);
-      t += itemBonus(equip.饰品, a);
-      if (equip.防具) {
-        for (const s of ['头部', '身体', '手部', '腿部', '内衬']) t += itemBonus(equip.防具[s], a);
-      }
+      // 遍历所有装备分类下的所有物品
+      ['武器', '防具', '饰品'].forEach(cat => {
+        if (equip[cat]) {
+          Object.values(equip[cat]).forEach(item => {
+            t += itemBonus(item, a);
+          });
+        }
+      });
       for (const sName in states) {
         const st = states[sName];
         if (st?.attributes_bonus?.[a]) t += num(st.attributes_bonus[a]);
@@ -266,18 +264,22 @@
     }
 
     let armor = 0;
-    const equip = ch.装备栏 || {};
+    const equip = ch.装备 || {};
     function armorOf(slot: any) {
       if (!slot) return 0;
-      if (typeof slot === 'object' && slot !== null) {
-        return num(slot?.armor_value);
-      }
+      if (typeof slot === 'object' && slot !== null) return num(slot?.armor_value);
       const item = findItem(ch, slot);
       return num(item?.armor_value);
     }
-    armor += armorOf(equip.武器);
-    armor += armorOf(equip.副手);
-    if (equip.防具) for (const s of ['头部', '身体', '手部', '腿部', '内衬']) armor += armorOf(equip.防具[s]);
+    // 遍历计算所有护甲
+    ['武器', '防具', '饰品'].forEach(cat => {
+        if (equip[cat]) {
+            Object.values(equip[cat]).forEach(item => {
+                armor += armorOf(item);
+            });
+        }
+    });
+
     ch.护甲值 = ch.护甲值 || { 当前值: 0, 最大值: 0 };
     if (ch.护甲值.最大值 !== armor) {
       ch.护甲值.最大值 = armor;
@@ -456,7 +458,7 @@
       purchaseConversion(stat, variables);
       normalizeCoordinates(stat);
       cleanupDeadEnemies(stat);
-      if (growMsgs.length > 0) pushMessage(variables, '成长提示', growMsgs.join(' | '));
+      if (growMsgs.length > 0) pushMessage(variables, '系统提示', growMsgs.join(' | '));
     } catch (e) {
       console.error('[Integrated Engine v2.3] 运行异常:', e);
     }
