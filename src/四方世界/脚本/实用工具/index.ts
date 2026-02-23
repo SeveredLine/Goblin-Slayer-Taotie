@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+const { eventOn, getButtonEvent, getVariables, deleteVariable, triggerSlash, toastr } = (window as any).ST_API || {};
+const $ = (window as any).$;
+
 const CTX = { type: 'message', message_id: 'latest' } as const;
 
 const setupDeleteButton = (btnName: string, getItemsFn: (vars: any) => string[], deletePathFn: (item: string, vars: any) => string) => {

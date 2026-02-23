@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+const { eventOn, getVariables, setVariable, triggerSlash, toastr } = (window as any).ST_API || {};
+const $ = (window as any).$;
+
 const CTX = { type: 'message', message_id: 'latest' } as const;
 
 const getCharacterJobs = (vars: any) => _.get(vars, 'stat_data.主角.职业', _.get(vars, '主角.职业', {}));

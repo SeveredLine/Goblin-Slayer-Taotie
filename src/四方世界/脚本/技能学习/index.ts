@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+const { eventOn, getButtonEvent, getVariables, setVariable, triggerSlash, toastr } = (window as any).ST_API || {};
+const $ = (window as any).$;
+
 const BTN_NAME = '技能学习';
 const CTX = { type: 'message', message_id: 'latest' } as const;
 
