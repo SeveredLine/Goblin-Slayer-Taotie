@@ -13,20 +13,20 @@ user名称user名称: {{user}}
     酒馆中的名称: 四方世界 ZOD
 
     # 源码入口文件夹
-    本地文件路径: 四方世界
+    本地文件路径: src/四方世界
 
     # 指定 Zod Schema 文件路径 (用于生成 initvar.yaml 和 校验)
-    schema: 四方世界/schema.ts
+    schema: src/四方世界/schema.ts
 
     # 包含的脚本列表
     # 打包工具会自动将这些 TS 编译并注入到角色卡中
     scripts:
-      - 四方世界/脚本/MVU初始化/index.ts
-      - 四方世界/脚本/成长系统/index.ts
-      - 四方世界/脚本/装备管理/index.ts
-      - 四方世界/脚本/技能学习/index.ts
-      - 四方世界/脚本/职业进阶/index.ts
-      - 四方世界/脚本/实用工具/index.ts
+      - src/四方世界/脚本/MVU初始化/index.ts
+      - src/四方世界/脚本/成长系统/index.ts
+      - src/四方世界/脚本/装备管理/index.ts
+      - src/四方世界/脚本/技能学习/index.ts
+      - src/四方世界/脚本/职业进阶/index.ts
+      - src/四方世界/脚本/实用工具/index.ts
 
     # 正则脚本
     regex_scripts: []

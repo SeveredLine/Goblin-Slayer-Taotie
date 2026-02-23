@@ -1,0 +1,1183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "世界": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "当前时间": {
+          "default": "战后十年/初醒之月/第一日",
+          "type": "string"
+        },
+        "世界动向": {
+          "default": "暂无重大动向",
+          "type": "string"
+        },
+        "城市趣闻": {
+          "default": "暂无趣闻",
+          "type": "string"
+        },
+        "冒险逸闻": {
+          "default": "暂无逸闻",
+          "type": "string"
+        }
+      }
+    },
+    "主角": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "姓名": {
+          "default": "{{user}}",
+          "type": "string"
+        },
+        "所在地": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "坐标": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          }
+        },
+        "职业": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "当前等级": {
+                    "default": 1,
+                    "type": "number"
+                  },
+                  "最大等级": {
+                    "default": 10,
+                    "type": "number"
+                  },
+                  "当前经验": {
+                    "type": "number"
+                  },
+                  "升级所需": {
+                    "default": 1000,
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "string",
+                "const": "待初始化"
+              }
+            ]
+          }
+        },
+        "经验等级": {
+          "default": 1,
+          "type": "number"
+        },
+        "技能点": {
+          "type": "number"
+        },
+        "种族": {
+          "default": "人类",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "能力": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "力量": {
+              "default": 5,
+              "type": "number"
+            },
+            "敏捷": {
+              "default": 5,
+              "type": "number"
+            },
+            "感知": {
+              "default": 5,
+              "type": "number"
+            },
+            "知识": {
+              "default": 5,
+              "type": "number"
+            },
+            "魅力": {
+              "default": 5,
+              "type": "number"
+            },
+            "魔力": {
+              "type": "number"
+            },
+            "信仰力": {
+              "type": "number"
+            }
+          }
+        },
+        "生命值": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "当前值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "最大值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "护甲值": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "当前值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "最大值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "魔力值": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "当前值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "最大值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "信仰力值": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "当前值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "最大值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "体力值": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "当前值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "最大值": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "历练进度": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "装备": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "武器": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/__schema1"
+              }
+            },
+            "防具": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/__schema1"
+              }
+            },
+            "饰品": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/__schema1"
+              }
+            }
+          }
+        },
+        "技能列表": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "default": "主动",
+                    "type": "string"
+                  },
+                  "tier": {
+                    "default": "T1",
+                    "type": "string"
+                  },
+                  "level": {
+                    "default": "初级",
+                    "type": "string"
+                  },
+                  "熟练度": {
+                    "type": "number"
+                  },
+                  "efficiency": {
+                    "default": 1,
+                    "type": "number"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "effect": {
+                    "type": "string"
+                  },
+                  "cost": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "string",
+                "const": "待初始化"
+              }
+            ]
+          }
+        },
+        "资产": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "名称": {
+                    "type": "string"
+                  },
+                  "位置": {
+                    "type": "string"
+                  },
+                  "整体介绍": {
+                    "type": "string"
+                  },
+                  "内部结构布局": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "string",
+                "const": "待初始化"
+              }
+            ]
+          }
+        },
+        "当前状态": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "level": {
+                    "default": "1",
+                    "type": "string"
+                  },
+                  "attributes_bonus": {
+                    "default": {},
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "type": {
+                    "default": "临时",
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "string",
+                "const": "待初始化"
+              }
+            ]
+          }
+        },
+        "任务日志": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "进行中": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            "已完成": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            }
+          }
+        },
+        "背包": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "公会信息": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "所属公会": {
+              "default": "无",
+              "type": "string"
+            },
+            "公会阶级": {
+              "default": "白瓷",
+              "type": "string"
+            },
+            "当前贡献度": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "关系列表": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "姓名": {
+                "type": "string"
+              },
+              "职业": {
+                "default": "未知",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  }
+                ]
+              },
+              "职业等级": {
+                "default": 1,
+                "type": "number"
+              },
+              "种族": {
+                "type": "string"
+              },
+              "is_companion": {
+                "type": "boolean"
+              },
+              "在场": {
+                "type": "boolean"
+              },
+              "好感度": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  }
+                ]
+              },
+              "信任度": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  }
+                ]
+              },
+              "能力": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "力量": {
+                    "default": 5,
+                    "type": "number"
+                  },
+                  "敏捷": {
+                    "default": 5,
+                    "type": "number"
+                  },
+                  "感知": {
+                    "default": 5,
+                    "type": "number"
+                  },
+                  "知识": {
+                    "default": 5,
+                    "type": "number"
+                  },
+                  "魅力": {
+                    "default": 5,
+                    "type": "number"
+                  },
+                  "魔力": {
+                    "type": "number"
+                  },
+                  "信仰力": {
+                    "type": "number"
+                  }
+                }
+              },
+              "装备": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "武器": {
+                    "default": {},
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "$ref": "#/$defs/__schema1"
+                    }
+                  },
+                  "防具": {
+                    "default": {},
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "$ref": "#/$defs/__schema1"
+                    }
+                  },
+                  "饰品": {
+                    "default": {},
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "$ref": "#/$defs/__schema1"
+                    }
+                  }
+                }
+              },
+              "背包": {
+                "$ref": "#/$defs/__schema2"
+              },
+              "技能列表": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "生命值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "护甲值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "魔力值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "信仰力值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "体力值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "公会信息": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "所属公会": {
+                    "default": "无",
+                    "type": "string"
+                  },
+                  "公会阶级": {
+                    "default": "无阶级",
+                    "type": "string"
+                  },
+                  "当前贡献度": {
+                    "type": "number"
+                  }
+                }
+              },
+              "身份背景": {
+                "type": "string"
+              },
+              "性格标签": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "boolean"
+                }
+              },
+              "外貌": {
+                "type": "string"
+              },
+              "称呼": {
+                "type": "string"
+              },
+              "与主角关系": {
+                "type": "string"
+              },
+              "层级": {
+                "default": "白瓷",
+                "type": "string"
+              },
+              "历练进度": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "性档案": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "私处叙述": {
+                    "type": "string"
+                  },
+                  "阴道结构叙述": {
+                    "type": "string"
+                  },
+                  "体位及次数": {
+                    "default": {},
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "技巧评价": {
+                    "type": "string"
+                  },
+                  "与主角意愿": {
+                    "type": "string"
+                  },
+                  "通用性癖好": {
+                    "type": "string"
+                  },
+                  "受孕与内射意愿": {
+                    "type": "string"
+                  }
+                }
+              },
+              "所处地点": {
+                "type": "string"
+              },
+              "重要记忆": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "string",
+            "const": "待初始化"
+          }
+        ]
+      }
+    },
+    "敌人列表": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "类型": {
+                "default": "人形",
+                "type": "string"
+              },
+              "生命值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "护甲值": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "当前值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "最大值": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "能力": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "number"
+                }
+              },
+              "备注": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "string",
+            "const": "待初始化"
+          }
+        ]
+      }
+    },
+    "地图位标": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "名称": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "坐标": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                }
+              },
+              "类型": {
+                "default": "调查",
+                "type": "string"
+              },
+              "临时": {
+                "type": "boolean"
+              },
+              "概况": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "string",
+            "const": "待初始化"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "__schema0": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "力量": {
+          "type": "number"
+        },
+        "敏捷": {
+          "type": "number"
+        },
+        "感知": {
+          "type": "number"
+        },
+        "知识": {
+          "type": "number"
+        },
+        "魅力": {
+          "type": "number"
+        },
+        "魔力": {
+          "type": "number"
+        },
+        "信仰力": {
+          "type": "number"
+        }
+      }
+    },
+    "__schema1": {
+      "default": "待初始化",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "default": "未命名物品",
+              "type": "string"
+            },
+            "type": {
+              "default": "杂物",
+              "type": "string"
+            },
+            "tier": {
+              "default": "普通",
+              "type": "string"
+            },
+            "part": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "armor_value": {
+              "type": "number"
+            },
+            "attributes_bonus": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "hands": {
+              "default": "单手",
+              "type": "string"
+            },
+            "special_effects": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "quantity": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "string",
+          "const": "待初始化"
+        }
+      ]
+    },
+    "__schema2": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "武器": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "防具": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "饰品": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "消耗品": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "材料": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "杂物": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "金钱": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "金币": {
+              "type": "number"
+            },
+            "银币": {
+              "type": "number"
+            },
+            "铜币": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  }
+}
