@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const { eventOn, getButtonEvent, getVariables, setVariable, triggerSlash, toastr } = (window as any).ST_API || {};
+// ST_API functions are accessed via (window as any) currently.
 const $ = (window as any).$;
 
 const BTN_NAME = '装备管理';

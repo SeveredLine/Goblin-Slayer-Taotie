@@ -1,45 +1,68 @@
 <template>
-  <aside class="relative flex flex-col">
-    <!-- 纸质纹理覆盖层 -->
-    <div class="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/old-wall.png')]"></div>
-
-    <header class="h-14 flex border-b border-[#c59d5f]/30">
+  <div class="flex h-full flex-col bg-[#1e1b18]">
+    <!-- Tab 导航栏 (类似书签) -->
+    <div class="flex border-b border-[#4a3e35] bg-[#121010]">
       <button 
-        v-for="tab in tabs" :key="tab.id"
+        v-for="tab in tabs" 
+        :key="tab.id"
+        class="relative flex-1 border-r border-[#2c2520] py-3 text-sm font-bold tracking-wider transition-colors hover:bg-[#2c2520]"
+        :class="currentTab === tab.id ? 'bg-[#241f1c] text-[#c59d5f]' : 'text-[#6b5b4b]'"
         @click="currentTab = tab.id"
-        :class="['flex-1 font-bold tracking-wider transition-colors text-sm', 
-                 currentTab === tab.id ? 'bg-[#c59d5f]/20 text-[#c59d5f] border-b-2 border-[#c59d5f]' : 'text-gray-500 hover:text-[#c59d5f]/70']"
       >
         {{ tab.name }}
+        <!-- 激活时的底部高亮条 -->
+        <div v-if="currentTab === tab.id" class="absolute bottom-0 left-0 h-[2px] w-full bg-[#c59d5f] shadow-[0_0_10px_#c59d5f]"></div>
       </button>
-    </header>
-
-    <div class="flex-1 overflow-y-auto p-5 custom-scrollbar relative z-10">
-      <div v-if="!heroStore.isLoaded" class="text-center text-gray-500 mt-10">研读羊皮纸...</div>
-      <template v-else>
-        <HeroStats v-show="currentTab === 'hero'" />
-        <Inventory v-show="currentTab === 'inv'" />
-        <Equipment v-show="currentTab === 'equip'" />
-        <SkillTree v-show="currentTab === 'skills'" />
-      </template>
     </div>
-  </aside>
+
+    <!-- 内容区：羊皮纸风格 -->
+    <div class="relative flex-1 overflow-hidden p-1">
+      <!-- 背景纹理 -->
+      <div class="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/parchment.png')] opacity-10"></div>
+      
+      <div class="custom-scrollbar h-full overflow-y-auto p-4">
+        <!-- 动态组件渲染 + GSAP 过渡动画 -->
+        <Transition mode="out-in" @enter="onEnter" @leave="onLeave">
+          <component :is="activeComponent" :key="currentTab" />
+        </Transition>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useHeroStore } from '../../stores/useHeroStore';
+import { gsap } from 'gsap';
+import { computed, ref } from 'vue';
 import HeroStats from './HeroStats.vue';
 import Inventory from './Inventory.vue';
-import Equipment from './Equipment.vue';
-import SkillTree from './SkillTree.vue';
+// 暂时用 Inventory 占位其他 Tab
+const currentTab = ref('character');
 
-const heroStore = useHeroStore();
-const currentTab = ref('hero');
 const tabs = [
-  { id: 'hero', name: '属性' },
-  { id: 'equip', name: '武装' },
-  { id: 'inv', name: '行囊' },
-  { id: 'skills', name: '技艺' }
+  { id: 'character', name: 'CHARACTER' },
+  { id: 'inventory', name: 'INVENTORY' },
+  { id: 'skills', name: 'SKILLS' },
+  { id: 'journal', name: 'JOURNAL' }
 ];
+
+const activeComponent = computed(() => {
+  switch (currentTab.value) {
+    case 'character': return HeroStats;
+    case 'inventory': return Inventory;
+    default: return Inventory;
+  }
+});
+
+// GSAP 进入动画
+const onEnter = (el: Element, done: () => void) => {
+  gsap.fromTo(el, 
+    { opacity: 0, x: -10, filter: 'blur(4px)' }, 
+    { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.3, ease: 'power2.out', onComplete: done }
+  );
+};
+
+// GSAP 离开动画
+const onLeave = (el: Element, done: () => void) => {
+  gsap.to(el, { opacity: 0, x: 10, filter: 'blur(4px)', duration: 0.2, ease: 'power2.in', onComplete: done });
+};
 </script>

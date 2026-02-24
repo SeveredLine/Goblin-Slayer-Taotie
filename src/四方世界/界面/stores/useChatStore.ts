@@ -5,25 +5,44 @@ import { ST_API } from '../utils/st-bridge';
 export const useChatStore = defineStore('chat', () => {
   const messages = ref<any[]>([]);
   const isGenerating = ref(false);
-  const streamingText = ref(''); // 当前正在流式生成的文本
+  const streamingText = ref('');
 
   const fetchMessages = async () => {
-    if (!ST_API.getChatMessages) return;
-    const msgs = await ST_API.getChatMessages('0-latest', { include_swipes: false });
-    messages.value = msgs || [];
+    try {
+      // 优先尝试 JS-Runner API (注意范围是 '0-' 代表全部)
+      if (ST_API.getChatMessages) {
+        const msgs = await ST_API.getChatMessages('0-', { include_swipes: false });
+        if (msgs && msgs.length > 0) {
+          messages.value = msgs;
+          return;
+        }
+      }
+      
+      // 暴力回退：直接去酒馆内存里捞聊天记录
+      const parentWin = window.parent as any;
+      const context = parentWin.SillyTavern?.getContext?.();
+      if (context && context.chat) {
+        messages.value = context.chat.map((msg: any, idx: number) => ({
+          message_id: idx,
+          role: msg.is_user ? 'user' : 'assistant',
+          message: msg.mes
+        }));
+      }
+    } catch (e) {
+      console.error('[ChatStore] 获取聊天记录失败', e);
+    }
   };
 
   const listenToChat = () => {
     if (!ST_API.eventOn || !ST_API.tavern_events) return;
     ST_API.eventOn(ST_API.tavern_events.CHAT_CHANGED, fetchMessages);
     ST_API.eventOn(ST_API.tavern_events.MESSAGE_RECEIVED, fetchMessages);
-
-    // 监听流式输出
+    
     ST_API.eventOn(ST_API.iframe_events.STREAM_TOKEN_RECEIVED_INCREMENTALLY, (text: string) => {
       streamingText.value += text;
     });
     ST_API.eventOn(ST_API.iframe_events.GENERATION_ENDED, () => {
-      streamingText.value = ''; // 结束后清空临时流，交由 MESSAGE_RECEIVED 拉取最新楼层
+      streamingText.value = ''; 
       fetchMessages();
     });
   };
@@ -34,7 +53,7 @@ export const useChatStore = defineStore('chat', () => {
     streamingText.value = '';
     
     try {
-      // should_stream: true 开启酒馆底层流式传输
+      // 通过 JS-Runner 让酒馆开始生成
       await ST_API.generate({ user_input: text, should_stream: true });
     } catch (e) {
       console.error('[ChatStore] 生成失败', e);
@@ -48,5 +67,5 @@ export const useChatStore = defineStore('chat', () => {
     listenToChat();
   };
 
-  return { messages, isGenerating, streamingText, sendInput, init };
+  return { messages, isGenerating, streamingText, sendInput, fetchMessages, init };
 });

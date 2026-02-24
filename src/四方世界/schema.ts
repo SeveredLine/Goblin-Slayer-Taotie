@@ -84,9 +84,9 @@ const normalizeRelationTier = (tier: string) => {
     '红玉': '红玉', '青铜': '青铜', '白银': '白银', '黄金': '黄金',
     '白金': '白金', '准金级': '准金级', '准金': '准金级'
   };
-  if (tierMapping[tier]) return tierMapping[tier];
+  if (tierMapping[normalized]) return tierMapping[normalized];
   for (const [key, value] of Object.entries(tierMapping)) {
-    if (tier.includes(key) || key.includes(tier)) return value;
+    if (normalized.includes(key) || key.includes(normalized)) return value;
   }
   return '白瓷';
 };
@@ -117,7 +117,7 @@ const handleJobLevelUp = (data: any) => {
   const jobs = data.职业 || {};
   let totalLevelUps = 0;
 
-  _.forOwn(jobs, (job: any, jobName: string) => {
+  _.forOwn(jobs, (job: any) => {
     if (job && typeof job === 'object' && job !== '待初始化') {
       if (!job.升级所需 || job.升级所需 === 0) job.升级所需 = 1000;
       const oldLevel = job.当前等级 || 1;

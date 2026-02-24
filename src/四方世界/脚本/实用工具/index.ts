@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const { eventOn, getButtonEvent, getVariables, deleteVariable, triggerSlash, toastr } = (window as any).ST_API || {};
+// ST_API functions are accessed via (window as any) currently.
 const $ = (window as any).$;
 
 const CTX = { type: 'message', message_id: 'latest' } as const;

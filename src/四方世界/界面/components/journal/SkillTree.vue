@@ -2,9 +2,9 @@
   <div class="space-y-6">
     <!-- 职业信息 -->
     <div>
-      <h3 class="text-[#c59d5f] border-b border-[#c59d5f]/30 mb-2 pb-1 text-sm">当前职业</h3>
-      <div v-for="(jobData, jobName) in jobs" :key="jobName" class="bg-black/30 p-3 border border-[#c59d5f]/20 rounded-sm">
-        <div class="flex justify-between font-bold mb-1">
+      <h3 class="mb-2 border-b border-[#c59d5f]/30 pb-1 text-sm text-[#c59d5f]">当前职业</h3>
+      <div v-for="(jobData, jobName) in jobs" :key="jobName" class="rounded-sm border border-[#c59d5f]/20 bg-black/30 p-3">
+        <div class="mb-1 flex justify-between font-bold">
           <span>{{ jobName }}</span>
           <span class="text-[#c59d5f]">Lv.{{ jobData.当前等级 || 1 }}</span>
         </div>
@@ -14,10 +14,10 @@
 
     <!-- 技能列表 -->
     <div>
-      <h3 class="text-[#c59d5f] border-b border-[#c59d5f]/30 mb-2 pb-1 text-sm">掌握技艺</h3>
+      <h3 class="mb-2 border-b border-[#c59d5f]/30 pb-1 text-sm text-[#c59d5f]">掌握技艺</h3>
       <div class="space-y-2">
-        <div v-for="(skill, name) in skills" :key="name" class="bg-black/20 p-2 text-sm border border-[#c59d5f]/10">
-          <div class="flex justify-between mb-1">
+        <div v-for="(skill, name) in skills" :key="name" class="border border-[#c59d5f]/10 bg-black/20 p-2 text-sm">
+          <div class="mb-1 flex justify-between">
             <span class="font-bold">{{ name }}</span>
             <span class="text-[#c59d5f]/80">[{{ skill.level || skill.等级 || '初级' }}]</span>
           </div>

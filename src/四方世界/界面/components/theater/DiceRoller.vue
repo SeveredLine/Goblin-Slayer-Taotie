@@ -1,8 +1,9 @@
 <template>
-  <div class="flex gap-2 px-4 pt-2 pb-1 border-b border-[#c59d5f]/10">
-    <span class="text-[#c59d5f]/60 text-xs leading-6">快捷掷骰:</span>
-    <button v-for="dice in ['d20', 'd6', 'd100']" :key="dice" @click="roll(dice)"
-            class="px-2 py-0.5 text-xs border border-[#c59d5f]/40 bg-black/40 text-[#c59d5f] hover:bg-[#c59d5f]/20 rounded-sm transition-colors">
+  <div class="flex gap-2 border-b border-[#c59d5f]/10 px-4 pt-2 pb-1">
+    <span class="text-xs leading-6 text-[#c59d5f]/60">快捷掷骰:</span>
+    <button
+v-for="dice in ['d20', 'd6', 'd100']" :key="dice" class="rounded-sm border border-[#c59d5f]/40 bg-black/40 px-2 py-0.5 text-xs text-[#c59d5f] transition-colors hover:bg-[#c59d5f]/20"
+            @click="roll(dice)">
       🎲 {{ dice }}
     </button>
   </div>

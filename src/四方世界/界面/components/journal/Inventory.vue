@@ -1,17 +1,17 @@
 <template>
   <div class="space-y-4">
     <!-- 财富 -->
-    <div class="flex justify-between bg-black/40 border border-[#c59d5f]/30 p-3 rounded-sm">
-      <span class="text-yellow-500 font-bold">🥇 {{ money.金币 || 0 }}</span>
-      <span class="text-gray-300 font-bold">🥈 {{ money.银币 || 0 }}</span>
-      <span class="text-orange-400 font-bold">🥉 {{ money.铜币 || 0 }}</span>
+    <div class="flex justify-between rounded-sm border border-[#c59d5f]/30 bg-black/40 p-3">
+      <span class="font-bold text-yellow-500">🥇 {{ money.金币 || 0 }}</span>
+      <span class="font-bold text-gray-300">🥈 {{ money.银币 || 0 }}</span>
+      <span class="font-bold text-orange-400">🥉 {{ money.铜币 || 0 }}</span>
     </div>
 
     <!-- 背包分类 -->
     <div v-for="(items, cat) in validCategories" :key="cat">
-      <h3 class="text-[#c59d5f] border-b border-[#c59d5f]/30 mb-2 pb-1 text-sm">{{ cat }}</h3>
+      <h3 class="mb-2 border-b border-[#c59d5f]/30 pb-1 text-sm text-[#c59d5f]">{{ cat }}</h3>
       <div class="grid grid-cols-1 gap-2">
-        <div v-for="(item, name) in items" :key="name" class="flex justify-between items-center bg-black/20 p-2 text-sm border border-transparent hover:border-[#c59d5f]/30">
+        <div v-for="(item, name) in items" :key="name" class="flex items-center justify-between border border-transparent bg-black/20 p-2 text-sm hover:border-[#c59d5f]/30">
           <span class="truncate pr-2">{{ name }}</span>
           <span class="text-gray-400">x{{ item.quantity || 1 }}</span>
         </div>

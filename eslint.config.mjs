@@ -43,6 +43,7 @@ export default [
         parser: tsParser,
         ecmaVersion: 'latest',
         sourceType: 'module',
+        warnOnUnsupportedTypeScriptVersion: false,
       },
       ecmaVersion: 'latest',
       sourceType: 'module',
