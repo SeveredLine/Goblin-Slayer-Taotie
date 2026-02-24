@@ -1,406 +1,410 @@
 <template>
   <div
-    class="fixed inset-0 z-99999 flex items-center justify-center overflow-hidden bg-[#030303] font-serif text-white select-none"
+    class="fixed inset-0 z-99999 flex items-center justify-center overflow-hidden bg-black font-serif text-white selection:bg-transparent"
   >
-    <!-- 背景层：动态模糊与宇宙尘埃 -->
-    <div class="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen">
+    <div class="pointer-events-none absolute inset-0 z-0 opacity-60">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(50,50,50,0.2)_0%,#000_80%)]"></div>
       <div
-        class="absolute inset-0 animate-pulse bg-[radial-gradient(ellipse_at_center,rgba(60,40,90,0.4)_0%,transparent_60%)] opacity-60 duration-10000"
-      ></div>
-      <div
-        class="absolute inset-0 animate-[spin_120s_linear_infinite] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30"
-      ></div>
-      <div
-        class="absolute inset-0 animate-[spin_180s_linear_infinite_reverse] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-15"
+        ref="bgStars"
+        class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-40 mix-blend-screen"
       ></div>
     </div>
 
-    <!-- 暗角遮罩 (Vignette) 聚焦中心视觉 -->
     <div
-      class="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,transparent_20%,#000_100%)]"
+      ref="flashOverlay"
+      class="pointer-events-none absolute inset-0 z-100 bg-white opacity-0 mix-blend-overlay"
     ></div>
 
-    <!-- 内容容器：增加镜头级控制层 -->
-    <div class="relative z-20 flex h-full w-full items-center justify-center overflow-hidden perspective-[1500px]">
+    <div
+      ref="noiseOverlay"
+      class="pointer-events-none absolute inset-0 z-50 hidden bg-[url('https://assets.codepen.io/13471/noise.png')] opacity-10 mix-blend-overlay"
+    ></div>
+
+    <div class="relative z-10 flex h-full w-full items-center justify-center perspective-[2000px]">
       <div
         ref="stage"
-        class="relative flex h-full w-full max-w-7xl transform-gpu items-center justify-center px-10 text-center"
+        class="relative flex h-full w-full max-w-screen-2xl transform-gpu items-center justify-center px-4 text-center"
       >
-        <!-- 渲染所有名单，通过 GSAP 控制显隐 -->
         <div
-          v-for="(scene, sIndex) in creditsSequence"
-          :key="'scene-' + sIndex"
-          class="scene-container pointer-events-none absolute inset-0 flex flex-col items-center justify-center opacity-0"
+          v-for="(scene, index) in creditsSequence"
+          :key="index"
+          :ref="el => (sceneRefs[index] = el as HTMLElement)"
+          class="scene-wrapper absolute flex w-full flex-col items-center justify-center opacity-0 will-change-transform"
+          :data-style="scene.style"
         >
-          <!-- 动态标题 (职能) - 电影级长间距 -->
           <div
-            class="role-text mb-8 transform-gpu font-serif text-xs font-bold tracking-[0.8em] text-[#a89f91] uppercase drop-shadow-2xl md:mb-14 md:text-xl"
+            class="role-text mb-6 font-mono text-xs font-bold tracking-[0.2em] text-[#888] uppercase md:mb-12 md:text-sm md:tracking-[0.5em] lg:text-lg lg:tracking-[1em]"
           >
             {{ scene.role }}
           </div>
 
-          <!-- 动态名单列表 -->
           <div
-            class="names-container flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-24 md:gap-y-12"
+            class="names-wrapper flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-4 px-2 md:gap-x-12 md:gap-y-6 md:px-10"
           >
             <div
               v-for="(name, nIndex) in scene.names"
-              :key="'name-' + sIndex + '-' + nIndex"
-              class="name-group inline-flex transform-gpu"
-              :data-style="scene.style"
+              :key="nIndex"
+              class="name-text text-center leading-tight font-black tracking-widest wrap-break-word uppercase"
+              :style="{
+                '-webkit-text-stroke': scene.style === 'slam' ? '0px' : '1px ' + scene.color,
+                color: scene.style === 'slam' ? '#ffffff' : 'transparent',
+                textShadow: scene.style === 'slam' ? '0 0 30px rgba(255,255,255,0.8)' : 'none',
+                fontSize:
+                  scene.style === 'slam' || scene.style === 'hero'
+                    ? 'clamp(2rem, 6vw, 7rem)'
+                    : 'clamp(1.2rem, 3.5vw, 4.5rem)',
+              }"
             >
-              <!-- 拆分字符级渲染，实现史诗感字距和打字特效 -->
-              <span
-                v-for="(char, cIndex) in name.split('')"
-                :key="cIndex"
-                class="name-char inline-block transform-gpu text-4xl font-black transition-colors sm:text-5xl md:text-6xl lg:text-[5.5rem]"
-                :style="{
-                  color: scene.color,
-                  textShadow: `0 0 15px ${scene.color}66, 0 0 30px ${scene.color}33`,
-                  marginRight: char === ' ' ? '0.4em' : '0',
-                }"
-              >
-                {{ char === ' ' ? '' : char }}
-              </span>
+              {{ name }}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 跳过提示 - 高级磨砂玻璃质感按钮 -->
     <button
-      class="group absolute right-8 bottom-8 z-30 cursor-pointer overflow-hidden rounded border border-white/20 bg-black/40 px-6 py-2 text-[10px] tracking-[0.3em] text-white/50 uppercase backdrop-blur-md transition-all duration-700 hover:border-white/60 hover:bg-white/10 hover:text-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+      class="group absolute right-6 bottom-6 z-200 cursor-pointer overflow-hidden rounded-sm border border-white/10 bg-black/80 px-6 py-2 font-mono text-[10px] tracking-[0.25em] text-white/40 transition-all duration-500 hover:border-white/80 hover:bg-white hover:text-black md:right-10 md:bottom-10 md:px-8 md:py-3 md:text-xs"
       @click="skip"
     >
-      <span class="relative z-10 block transition-transform group-hover:scale-110">[ Skip Sequence ]</span>
-      <div
-        class="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-      ></div>
+      <span class="relative z-10 block">SKIP</span>
     </button>
-
-    <!-- 电影级进度条 - 细长发光线条 -->
-    <div class="absolute bottom-0 left-0 z-30 h-0.5 w-full bg-white/5">
-      <div
-        ref="progressBar"
-        class="relative h-full w-0 bg-linear-to-r from-transparent via-[#c59d5f] to-[#ffdeb3] shadow-[0_0_10px_#c59d5f]"
-      >
-        <!-- 进度条头部发光点 -->
-        <div class="absolute top-1/2 right-0 h-1 w-3.75 -translate-y-1/2 bg-white blur-[2px]"></div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { gsap } from 'gsap';
+import { CustomEase } from 'gsap/CustomEase';
+import { CustomWiggle } from 'gsap/CustomWiggle';
+import { RoughEase } from 'gsap/EasePack';
+import { Physics2DPlugin } from 'gsap/Physics2DPlugin';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { SplitText } from 'gsap/SplitText';
+import { TextPlugin } from 'gsap/TextPlugin';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
-const emit = defineEmits<{
-  (e: 'complete'): void;
-}>();
+gsap.registerPlugin(CustomEase, CustomWiggle, RoughEase, ScrambleTextPlugin, SplitText, Physics2DPlugin, TextPlugin);
 
+const emit = defineEmits<{ (e: 'complete'): void }>();
+
+const sceneRefs = ref<HTMLElement[]>([]);
 const stage = ref<HTMLElement | null>(null);
-const progressBar = ref<HTMLElement | null>(null);
-let masterTl: gsap.core.Timeline | null = null;
+const bgStars = ref<HTMLElement | null>(null);
+const flashOverlay = ref<HTMLElement | null>(null);
 
-// 名单配置
+let ctx: gsap.Context;
+
 const creditsSequence = [
-  { role: 'ORIGINAL AUTHOR', names: ['Elainades'], color: '#FFD700', style: 'hero' },
+  { role: 'ORIGINAL AUTHOR', names: ['Elainades'], color: '#ffffff', style: 'hero' },
   {
     role: 'CORE ARCHITECTS & LOGIC',
     names: ['Keil', '11', 'KKKKKK_0735', 'Sulfurzero', 'USS Essex CV-9'],
     color: '#00F0FF',
-    style: 'grid',
+    style: 'cyber',
   },
   { role: 'VISUALS & AESTHETICS', names: ['龙使者德丽莎', '热水壶', 'エル'], color: '#FF0055', style: 'glitch' },
   {
     role: 'WORLD BUILDERS & SCENARIO',
     names: ['Italian Pasta', '露琪诺', 'K1nn', 'S15萌新', 'Gemini114514'],
     color: '#50C878',
-    style: 'cloud',
+    style: 'kinetic',
   },
   {
     role: 'CHARACTERS & STORIES',
     names: ['Glen0822', '烁寒', '露琪亚', '哈气咪', 'Shiyue137', 'Tttk2929'],
     color: '#E0B0FF',
-    style: 'cloud',
+    style: 'float',
   },
   {
     role: 'SPECIAL THANKS',
     names: ['快乐柠檬茶', 'Hsuika·赤猫肆号', '黑森森', '梦星宝子', 'AA', 'Boss', 'Shin'],
     color: '#FFA500',
-    style: 'cloud',
+    style: 'particles',
   },
-  { role: 'VALHALLA (LEGACY)', names: ['Qwerty', 'LunaGlaze'], color: '#808080', style: 'fade' },
-  { role: 'PRESENTED BY', names: ['THE FOUR DICE WORLD', 'ZOD EDITION'], color: '#ffffff', style: 'final' },
+  { role: 'VALHALLA', names: ['qwerty', 'LunaGlaze'], color: '#A9A9A9', style: 'float' },
+  // style: slam 将触发特殊渐变逻辑
+  { role: 'PRESENTED BY', names: ['THE FOUR DICE WORLD', 'ZOD EDITION'], color: '#ffffff', style: 'slam' },
 ];
 
-// --- 动画编排 ---
-const playSequence = async () => {
-  if (!stage.value) return;
-
-  // Ensure Vue has fully rendered the elements before querying
+const initAnimation = async () => {
   await nextTick();
 
-  const scenes = stage.value.querySelectorAll('.scene-container');
-
-  masterTl = gsap.timeline({
-    onComplete: finish,
-    onUpdate: function () {
-      if (progressBar.value) {
-        gsap.set(progressBar.value, { width: `${this.progress() * 100}%` });
-      }
-    },
-  });
-
-  scenes.forEach((sceneEl, index) => {
-    const roleText = sceneEl.querySelector('.role-text');
-    const nameGroups = sceneEl.querySelectorAll('.name-group');
-    const nameChars = sceneEl.querySelectorAll('.name-char'); // 用于字符级高级动画
-
-    // 为了实现交错复杂的独立动画，有些情况我们会同时使用字级别和组级别
-    const styleType = nameGroups[0]?.getAttribute('data-style') || 'fade';
-
-    // 我们在这个子时间轴构建完整的起承转合
-    const sceneTl = gsap.timeline();
-
-    // 初始化场景显现（解决重叠时无意间的相互阻挡）
-    sceneTl.set(sceneEl, { opacity: 1, pointerEvents: 'auto' });
-
-    // --- 【1】相机运动 (全局舞台联动) ---
-    // 根据是哪一种场景，给整个舞台施加一个非常缓慢的 3D 漂移/推进，模拟斯坦尼康或者摇臂
-    // 在子场景开始时将 stage 设置到起始位置，并在该场景的持续时间内运动
-    if (index % 2 === 0) {
-      sceneTl.fromTo(
-        stage.value,
-        { rotationY: -5, rotationX: 2, z: -100 },
-        { rotationY: 5, rotationX: -2, z: 150, duration: 4.5, ease: 'sine.inOut' },
-        0,
-      );
-    } else {
-      sceneTl.fromTo(
-        stage.value,
-        { rotationY: 5, rotationX: -2, z: -150 },
-        { rotationY: -5, rotationX: 2, z: 100, duration: 4.5, ease: 'sine.inOut' },
-        0,
-      );
-    }
-
-    // --- 【2】职能前置介绍 ---
-    // 高级微电影质感：极大字距 + 严重模糊的迅速对焦
-    sceneTl.fromTo(
-      roleText,
-      { opacity: 0, y: 40, filter: 'blur(15px)', letterSpacing: '0.2em', scale: 0.9 },
-      { opacity: 1, y: 0, filter: 'blur(0px)', letterSpacing: '0.8em', scale: 1, duration: 1.5, ease: 'expo.out' },
-      0.1,
-    );
-
-    // --- 【3】核心姓名动画：极致多样化 ---
-    if (styleType === 'hero') {
-      // Hero: 碎片聚合，极端的 Z 轴深度和强烈的动态模糊
-      sceneTl.fromTo(
-        nameChars,
-        {
-          opacity: 0,
-          scale: 4,
-          z: 800,
-          filter: 'blur(30px)',
-          rotationX: () => gsap.utils.random(-80, 80),
-          rotationY: () => gsap.utils.random(-80, 80),
-        },
-        {
-          opacity: 1,
-          scale: 1,
-          z: 0,
-          filter: 'blur(0px)',
-          rotationX: 0,
-          rotationY: 0,
-          duration: 1.8,
-          stagger: { amount: 0.8, from: 'random' },
-          ease: 'power4.out',
-        },
-        0.4,
-      );
-    } else if (styleType === 'grid') {
-      // Grid: 赛博朋克风格打字机伴随翻转，单词级别强硬切入
-      sceneTl.fromTo(
-        nameGroups,
-        { opacity: 0, y: 120, rotationX: -90, filter: 'contrast(2) brightness(0)' },
-        {
-          opacity: 1,
-          y: 0,
-          rotationX: 0,
-          filter: 'contrast(1) brightness(1)',
-          duration: 1.2,
-          stagger: 0.15,
-          ease: 'back.out(2)',
-        },
-        0.4,
-      );
-      // 每个字符在被翻出时瞬间闪亮
-      sceneTl.fromTo(
-        nameChars,
-        { color: '#ffffff', textShadow: '0 0 40px #fff' },
-        { color: '', textShadow: '', duration: 0.5, stagger: 0.05, ease: 'power2.out' },
-        0.5,
-      );
-    } else if (styleType === 'glitch') {
-      // Glitch: 故障切入，剧烈的失真错位
-      sceneTl.fromTo(
-        nameGroups,
-        { opacity: 0, scale: 1.05, filter: 'blur(20px)' },
-        { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.inOut' },
-        0.3,
-      );
-      sceneTl.fromTo(
-        nameChars,
-        { opacity: 0, x: () => gsap.utils.random(-50, 50), skewX: () => gsap.utils.random(-40, 40) },
-        { opacity: 1, x: 0, skewX: 0, duration: 0.2, stagger: { amount: 0.4, from: 'random' } },
-        0.4,
-      );
-      // 中途脉冲干扰
-      sceneTl.to(
-        nameChars,
-        {
-          duration: 0.1,
-          skewX: () => gsap.utils.random(-15, 15),
-          x: () => gsap.utils.random(-5, 5),
-          filter: 'hue-rotate(90deg) brightness(2)',
-          repeat: 3,
-          yoyo: true,
-          stagger: 0.02,
-        },
-        1.2,
-      );
-    } else if (styleType === 'cloud') {
-      // Cloud: 墨水晕染，极其轻柔缥缈，缓慢上升显现
-      sceneTl.fromTo(
-        nameChars,
-        { opacity: 0, y: 50, filter: 'blur(20px) contrast(0.5)', scale: 0.9 },
-        {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px) contrast(1)',
-          scale: 1,
-          duration: 2.5,
-          stagger: { amount: 1.5, from: 'edges' },
-          ease: 'sine.out',
-        },
-        0.3,
-      );
-    } else if (styleType === 'final') {
-      // Final: 史诗揭示，宏大缓慢的全局光效
-      sceneTl.fromTo(
-        nameGroups,
-        { opacity: 0, scale: 0.8, filter: 'blur(25px) brightness(3)', y: 20 },
-        {
-          opacity: 1,
-          scale: 1,
-          filter: 'blur(0px) brightness(1)',
-          y: 0,
-          duration: 3.5,
-          stagger: 0.6,
-          ease: 'power2.out',
-        },
-        0.4,
-      );
-      // 让字母之间产生呼吸感
-      sceneTl.fromTo(
-        nameChars,
-        { letterSpacing: '0.5em' },
-        { letterSpacing: 'normal', duration: 4, ease: 'power3.out' },
-        0.4,
-      );
-    } else {
-      // 默认 Fade: 像夜空中星辰点亮，带有随机旋转的浮动
-      sceneTl.fromTo(
-        nameChars,
-        { opacity: 0, filter: 'blur(10px)', rotationZ: () => gsap.utils.random(-15, 15), scale: 0.8 },
-        {
-          opacity: 1,
-          filter: 'blur(0px)',
-          rotationZ: 0,
-          scale: 1,
-          duration: 1.8,
-          stagger: { amount: 1.2, from: 'random' },
-          ease: 'power2.out',
-        },
-        0.4,
-      );
-    }
-
-    // --- 【4】悬停观赏 (Hold) ---
-    // 根据风格设置不同的观赏停留期
-    const holdDuration = styleType === 'final' ? 4.5 : 2.5;
-    sceneTl.to({}, { duration: holdDuration });
-
-    // --- 【5】优雅离场 (Dissolve Exit) ---
-    const exitDuration = 1.0;
-
-    // 标题散去
-    sceneTl.to(roleText, {
-      opacity: 0,
-      y: -30,
-      filter: 'blur(15px)',
-      letterSpacing: '0.4em',
-      duration: exitDuration,
-      ease: 'power2.in',
+  ctx = gsap.context(() => {
+    // 背景旋转
+    gsap.to(bgStars.value, {
+      rotation: 360,
+      duration: 200,
+      ease: 'none',
+      repeat: -1,
     });
 
-    // 根据是否具有逐字特效，选择目标进行离场
-    const exitTargets = nameChars.length && styleType !== 'grid' && styleType !== 'final' ? nameChars : nameGroups;
+    const masterTl = gsap.timeline({
+      onComplete: finish,
+      defaults: { ease: 'power3.inOut' },
+    });
 
-    sceneTl.to(
-      exitTargets,
-      {
-        opacity: 0,
-        z: 400, // 向前冲出镜头
-        filter: 'blur(20px)',
-        scale: 1.2,
-        duration: exitDuration + 0.2,
-        stagger: { amount: 0.3, from: 'center' },
-        ease: 'power2.in',
-      },
-      `<`,
-    );
+    masterTl.set(stage.value, { scale: 1.1, autoAlpha: 1 });
+    // 开场闪光
+    masterTl
+      .to(flashOverlay.value, { opacity: 1, duration: 0.05, ease: 'power4.in' })
+      .to(flashOverlay.value, { opacity: 0, duration: 1.5, ease: 'power2.out' }, '+=0');
 
-    // 收尾，清理事件穿透
-    sceneTl.set(sceneEl, { opacity: 0, pointerEvents: 'none' });
+    sceneRefs.value.forEach((scene, i) => {
+      const config = creditsSequence[i];
+      const role = scene.querySelector('.role-text');
+      const nameElements = scene.querySelectorAll('.name-text');
 
-    // --- 【6】注入主轴，重叠衔接 ---
-    // 第一个场景马上播放，后续所有场景都会在*前一个场景离场开始时*提前 0.8 秒切入
-    // 这将实现类似电影中的镜头无缝交织
-    const overlapObj = index === 0 ? '+=0' : '-=0.8';
-    masterTl!.add(sceneTl, overlapObj);
+      const tl = gsap.timeline();
+
+      let splitRole: SplitText | null = null;
+      let splitNames: SplitText | null = null;
+
+      // Slam 模式下我们不拆分文字，保持整体以应用渐变
+      if (config.style !== 'slam') {
+        splitRole = new SplitText(role, { type: 'chars,words' });
+        splitNames = new SplitText(nameElements, { type: 'chars,words' });
+      }
+
+      tl.set(scene, { autoAlpha: 1, z: 0 });
+
+      // --- 动画逻辑分支 ---
+
+      if (config.style === 'hero') {
+        tl.from(splitNames!.chars, {
+          duration: 2,
+          opacity: 0,
+          scale: 0,
+          y: 80,
+          rotationX: 180,
+          transformOrigin: '0% 50% -50',
+          ease: 'back.out(1.7)',
+          stagger: 0.05,
+        }).to(
+          role,
+          {
+            duration: 1.5,
+            scrambleText: { text: config.role, chars: 'XOvx#', revealDelay: 0.5, tweenLength: false },
+          },
+          '<',
+        );
+      } else if (config.style === 'cyber') {
+        tl.set(nameElements, { color: config.color, textShadow: `0 0 20px ${config.color}` });
+
+        // 增加颜色变幻效果
+        gsap.to(nameElements, {
+          color: '#A020F0', // 变紫
+          textShadow: '0 0 25px #A020F0',
+          duration: 0.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          stagger: 0.2,
+        });
+
+        tl.from(splitNames!.chars, {
+          duration: 0.6,
+          opacity: 0,
+          x: 100,
+          autoAlpha: 0,
+          stagger: { amount: 0.5, from: 'random' },
+          ease: 'steps(12)',
+        }).from(role, { duration: 0.5, opacity: 0, letterSpacing: '2em' }, '<');
+      } else if (config.style === 'glitch') {
+        CustomWiggle.create('glitchWiggle', { wiggles: 20, type: 'uniform' });
+        tl.set(nameElements, { color: 'white' });
+
+        // 增加随机颜色Glitch
+        tl.to(
+          nameElements,
+          {
+            color: () => (Math.random() > 0.5 ? config.color : '#FFFFFF'),
+            duration: 0.1,
+            repeat: 10,
+            yoyo: true,
+          },
+          0,
+        );
+
+        tl.from(splitNames!.chars, {
+          duration: 0.2,
+          opacity: 0,
+          scale: 2,
+          filter: 'blur(10px)',
+          stagger: { amount: 0.3, from: 'center' },
+        }).to(
+          splitNames!.chars,
+          {
+            duration: 0.8,
+            x: 5,
+            y: -5,
+            color: config.color,
+            ease: 'glitchWiggle',
+            stagger: { amount: 0.5, from: 'random' },
+          },
+          '<+0.1',
+        );
+      } else if (config.style === 'kinetic') {
+        tl.from(splitNames!.chars, {
+          duration: 1.2,
+          y: 200,
+          rotationZ: 90,
+          opacity: 0,
+          ease: 'expo.out',
+          stagger: 0.03,
+        });
+      } else if (config.style === 'particles') {
+        tl.from(splitNames!.chars, {
+          duration: 2.5,
+          physics2D: {
+            velocity: 600,
+            angle: 'random(-180, 0)',
+            gravity: 500,
+          },
+          opacity: 0,
+          scale: 0,
+          stagger: 0.02,
+        });
+      } else if (config.style === 'slam') {
+        tl.set(nameElements, { opacity: 0 });
+        tl.fromTo(role, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 });
+
+        if (nameElements[0]) {
+          // 第一行：纯白强光砸下
+          tl.fromTo(
+            nameElements[0],
+            { scale: 5, z: 500, opacity: 0, textShadow: '0 0 100px #ffffff' },
+            {
+              scale: 1,
+              z: 0,
+              opacity: 1,
+              textShadow: '0 0 30px rgba(255,255,255,0.8)',
+              duration: 0.3,
+              ease: 'power4.in',
+            },
+          );
+          tl.add(() => {
+            gsap.fromTo(flashOverlay.value, { opacity: 0.3, mixBlendMode: 'overlay' }, { opacity: 0, duration: 0.5 });
+            gsap.fromTo(stage.value, { y: 10 }, { y: 0, duration: 0.3, ease: 'elastic.out(1, 0.5)' });
+          });
+        }
+
+        tl.addLabel('slam2', '+=0.3');
+
+        if (nameElements[1]) {
+          // 第二行：将 ZOD EDITION 拆分为单个字母
+          const splitZod = new SplitText(nameElements[1], { type: 'chars' });
+
+          // 定义一组高饱和度的赛博霓虹纯色
+          const neonColors = [
+            '#FF0055',
+            '#00F0FF',
+            '#50C878',
+            '#E0B0FF',
+            '#FFA500',
+            '#FF3366',
+            '#FFFF00',
+            '#9933FF',
+            '#FF0000',
+            '#00FF00',
+          ];
+
+          // 给每个字母单独上色和发光阴影
+          gsap.set(splitZod.chars, {
+            color: i => neonColors[i % neonColors.length],
+            textShadow: i => `0 0 20px ${neonColors[i % neonColors.length]}`,
+          });
+
+          // 整体包裹框砸下（不影响内部子元素的颜色）
+          tl.fromTo(
+            nameElements[1],
+            { scale: 8, z: 800, opacity: 0 },
+            { scale: 1, z: 0, opacity: 1, duration: 0.35, ease: 'power4.in' },
+            'slam2',
+          );
+
+          tl.add(() => {
+            gsap.fromTo(
+              flashOverlay.value,
+              { opacity: 1, mixBlendMode: 'normal', backgroundColor: 'white' },
+              {
+                opacity: 0,
+                duration: 2.5,
+                ease: 'power2.out',
+                onComplete: () => {
+                  if (flashOverlay.value) flashOverlay.value.style.mixBlendMode = 'overlay';
+                },
+              },
+            );
+            gsap.fromTo(
+              stage.value,
+              { x: -15, y: 15, scale: 1.05 },
+              { x: 0, y: 0, scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.3)' },
+            );
+          }, 'slam2+=0.3');
+        }
+
+        tl.to(nameElements, { letterSpacing: '0.1em', duration: 4, ease: 'power1.out' }, 'slam2');
+      } else {
+        // Default Float style
+        tl.from(splitNames!.chars, {
+          opacity: 0,
+          filter: 'blur(15px)',
+          scale: 1.5,
+          duration: 1.5,
+          stagger: 0.05,
+          ease: 'sine.out',
+        });
+      }
+
+      // --- 退出逻辑 ---
+      const hold = config.style === 'slam' ? 4 : 2;
+
+      if (config.style !== 'slam') {
+        tl.to(
+          [splitNames!.chars, splitRole!.chars],
+          {
+            duration: 0.8,
+            opacity: 0,
+            z: -500,
+            filter: 'blur(20px)',
+            stagger: { amount: 0.2, from: 'end' },
+            ease: 'power2.in',
+          },
+          `+=${hold}`,
+        );
+        tl.set(scene, { autoAlpha: 0 });
+        masterTl.add(tl, i === 0 ? 0 : '-=0.6');
+      } else {
+        // Slam 场景的退出
+        tl.to(scene, { duration: 2, scale: 0.95, opacity: 0, ease: 'power2.inOut' }, `+=${hold}`);
+        masterTl.add(tl, '-=0.4');
+      }
+    });
   });
 };
 
 const finish = () => {
-  if (masterTl) masterTl.kill();
-  gsap.to(stage.value, { scale: 1.5, opacity: 0, duration: 1, onComplete: () => emit('complete') });
+  gsap.to(stage.value, { opacity: 0, duration: 1, onComplete: () => emit('complete') });
 };
 
 const skip = () => {
-  if (masterTl) masterTl.kill();
+  ctx?.revert();
   emit('complete');
 };
 
-onMounted(() => {
-  // Add slight delay to ensure DOM is ready and fonts loaded
-  setTimeout(() => {
-    playSequence();
-  }, 100);
-});
-
-onBeforeUnmount(() => {
-  if (masterTl) masterTl.kill();
-});
+onMounted(initAnimation);
+onBeforeUnmount(() => ctx?.revert());
 </script>
 
 <style scoped>
-.scene-container {
-  /* Ensuring scenes perfectly overlap in the center */
+.scene-wrapper {
   transform-style: preserve-3d;
+}
+.role-text,
+.name-text {
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+.names-wrapper {
+  max-width: 95vw;
 }
 </style>
